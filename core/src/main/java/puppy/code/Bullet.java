@@ -6,52 +6,59 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 
-public class Bullet {
-
+public class Bullet extends ObjetoEspacial implements Colisionable {
     private float xSpeed;
     private float ySpeed;
     private boolean destroyed = false;
-    private Sprite spr;
 
-    // Constructor modificado para aceptar el ángulo
     public Bullet(float x, float y, float angle, Texture tx) {
-        spr = new Sprite(tx);
-        spr.setPosition(x, y);
-        spr.setRotation(angle); // Aplicamos la rotación del ángulo al sprite
+        super(tx, (int)x, (int)y); // Conversión de float a int si es necesario
+        spr.setRotation(angle);
 
-        // Velocidad de la bala y dirección calculadas usando el ángulo
         float speed = 5f; // Ajusta esta velocidad según lo que necesites
         xSpeed = speed * MathUtils.cosDeg(angle + 90); // +90 para ajustar la dirección
         ySpeed = speed * MathUtils.sinDeg(angle + 90);
     }
 
-    public void update() {
-        // Actualiza la posición de la bala en la dirección especificada
+    @Override
+    public void mover() {
+        // Implementación del movimiento para la bala
         spr.setPosition(spr.getX() + xSpeed, spr.getY() + ySpeed);
 
-        // Si la bala sale de los límites de la pantalla, la marcamos como destruida
-        if (spr.getX() < 0 || spr.getX() + spr.getWidth() > Gdx.graphics.getWidth()) {
-            destroyed = true;
+        // Verifica si la bala salió de la pantalla
+        if (spr.getX() < 0 || spr.getX() + spr.getWidth() > Gdx.graphics.getWidth() ||
+            spr.getY() < 0 || spr.getY() + spr.getHeight() > Gdx.graphics.getHeight()) {
+            destroyed = true; // Marca como destruida si sale de la pantalla
         }
-        if (spr.getY() < 0 || spr.getY() + spr.getHeight() > Gdx.graphics.getHeight()) {
-            destroyed = true;
-        }
+    }
+
+    // Método que debe ser llamado en actualizarBalas()
+    public void update() {
+        mover(); // Llama al método mover() para actualizar la posición
     }
 
     public void draw(SpriteBatch batch) {
         spr.draw(batch);
     }
 
-    public boolean checkCollision(Ball2 b2) {
-        if (spr.getBoundingRectangle().overlaps(b2.getArea())) {
-            // Se destruye la bala en caso de colisión
-            destroyed = true;
-            return true;
+    // Implementación de la interfaz Colisionable
+    @Override
+    public boolean detectarColision(ObjetoEspacial otro) {
+        if (otro instanceof Ball2) {
+            Ball2 asteroide = (Ball2) otro;
+            return spr.getBoundingRectangle().overlaps(asteroide.getArea());
         }
         return false;
     }
 
+    @Override
+    public void alColisionar(ObjetoEspacial otro) {
+        if (otro instanceof Ball2) {
+            destroyed = true; // La bala se destruye al colisionar con Ball2
+        }
+    }
+
     public boolean isDestroyed() {
-        return destroyed;
+        return destroyed; // Devuelve verdadero si la bala ha sido destruida
     }
 }
