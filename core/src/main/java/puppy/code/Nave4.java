@@ -29,10 +29,10 @@ public class Nave4 extends ObjetoEspacial implements Colisionable {
     public void mover() {
         // Movimiento de la nave
         if (!herido) {
-            if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) xVel--;
-            if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) xVel++;
-            if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) yVel--;
-            if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) yVel++;
+            if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT) || Gdx.input.isKeyJustPressed(Input.Keys.A)) xVel--;
+            if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) || Gdx.input.isKeyJustPressed(Input.Keys.D)) xVel++;
+            if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN) || Gdx.input.isKeyJustPressed(Input.Keys.S)) yVel--;
+            if (Gdx.input.isKeyJustPressed(Input.Keys.UP) || Gdx.input.isKeyJustPressed(Input.Keys.W)) yVel++;
 
             float x = spr.getX() + xVel;
             float y = spr.getY() + yVel;
