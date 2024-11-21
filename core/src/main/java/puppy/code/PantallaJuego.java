@@ -22,6 +22,7 @@ public class PantallaJuego implements Screen {
     private int velXAsteroides;
     private int velYAsteroides;
     private int cantAsteroides;
+    private int cantAsteroidesGrandes;
 
     private Nave4 nave;
     private ArrayList<Ball2> balls = new ArrayList<>();
@@ -29,8 +30,11 @@ public class PantallaJuego implements Screen {
 
     public PantallaJuego(SpaceNavigation game, int ronda, int vidas, int score, int velXAsteroides, int velYAsteroides) {
         this.game = game;
+        this.velXAsteroides = velXAsteroides;
+        this.velYAsteroides = velYAsteroides;
         GameManager gm = GameManager.getInstance();
         this.cantAsteroides = calcularCantidadAsteroides(ronda);
+        this.cantAsteroidesGrandes = calcularCantidadAsteroidesGrandes(ronda);
         batch = game.getBatch();
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 640);
@@ -58,10 +62,22 @@ public class PantallaJuego implements Screen {
                                   new Texture(Gdx.files.internal("aGreyMedium4.png")));
             balls.add(bb);
         }
+        for (int i = 0; i < cantAsteroidesGrandes; i++) {
+            Ball2 bb = new Ball2(r.nextInt((int) Gdx.graphics.getWidth()),
+                                  50 + r.nextInt((int) Gdx.graphics.getHeight() - 50),
+                                  20 + r.nextInt(10), velXAsteroides + r.nextInt(4),
+                                  velYAsteroides + r.nextInt(4),
+                                  new Texture(Gdx.files.internal("aGreyLarge.png")));
+            balls.add(bb);
+        }
     }
 
     private int calcularCantidadAsteroides(int ronda) {
         return 1 + (ronda - 1) * 2;
+    }
+    
+    private int calcularCantidadAsteroidesGrandes(int ronda) {
+        return 1 + (ronda - 1);
     }
 
     public void dibujaEncabezado() {

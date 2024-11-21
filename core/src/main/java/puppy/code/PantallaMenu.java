@@ -8,13 +8,19 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+
 public class PantallaMenu implements Screen {
 
 	private SpaceNavigation game;
 	private OrthographicCamera camera;
 	private BitmapFont titleFont;
 	private BitmapFont instructionFont;
+        private BitmapFont difficultyFont;
+        
 	private float timeElapsed;
+        private String difficulty = "No seleccionada";  // Dificultad predeterminada
+        private DificultadStrategy dificultad;
+        private boolean difficultySelected = false;
 
 	public PantallaMenu(SpaceNavigation game) {
 		this.game = game;
@@ -28,6 +34,10 @@ public class PantallaMenu implements Screen {
 
 		instructionFont = new BitmapFont();
 		instructionFont.getData().setScale(1.5f);
+                
+                difficultyFont = new BitmapFont();
+                difficultyFont.setColor(Color.LIGHT_GRAY);
+                difficultyFont.getData().setScale(1.5f);
 	}
 
 	@Override
@@ -48,19 +58,54 @@ public class PantallaMenu implements Screen {
 		// Título "Bienvenido a Space Navigation!"
 		titleFont.draw(game.getBatch(), "Bienvenido a Space Navigation!", 200, 500);
 
-		// Instrucciones con parpadeo suave
-		instructionFont.setColor(instructionColor); // Aplica el color de parpadeo
-		instructionFont.draw(game.getBatch(), "Pincha en cualquier lado o presiona cualquier tecla para comenzar ...", 200, 300);
+                
+                // Instrucciones para seleccionar dificultad
+                difficultyFont.draw(game.getBatch(), "Selecciona la dificultad: 1. Fácil / 2. Media / 3. Difícil", 200, 350);
+                difficultyFont.draw(game.getBatch(), "Dificultad seleccionada: " + difficulty, 200, 300);
+                
+                // Instrucciones con parpadeo suave
+                instructionFont.setColor(instructionColor); // Aplica el color de parpadeo
+                instructionFont.draw(game.getBatch(), "Pincha ENTER para comenzar ...", 200, 200);
 
 		game.getBatch().end();
 
-		// Inicio del juego al presionar cualquier tecla o hacer clic
-		if (Gdx.input.isTouched() || Gdx.input.isKeyJustPressed(Input.Keys.ANY_KEY)) {
-			Screen ss = new PantallaJuego(game,1,3,0,1,1);
-			ss.resize(1200, 800);
-			game.setScreen(ss);
-			dispose();
-		}
+		// Detecta la selección de dificultad (1 o 3)
+                if (!difficultySelected) {
+                    if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
+                        dificultad = new DificultadFacil();
+                        difficulty = "Fácil";
+                        difficultySelected = true;
+                        
+                    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
+                        dificultad = new DificultadMedia();
+                        difficulty = "Media";
+                        difficultySelected = true;
+                        
+                    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
+                        dificultad = new DificultadDificil();
+                        difficulty = "Difícil";
+                        difficultySelected = true;
+                    }
+                }
+
+                // Si se presiona ENTER, asigna dificultad por defecto si no se ha seleccionado
+                if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                    if (dificultad == null) {
+                        // Asume "Fácil" si no se ha seleccionado ninguna dificultad
+                        dificultad = new DificultadFacil();
+                    }
+                    int ronda = 1; // Ronda inicial
+                    int vidas = 3; // Número de vidas iniciales
+                    int score = 0; // Puntuación inicial
+                    int velXAsteroides = dificultad.calcularVelocidadAsteroides(ronda);
+                    int velYAsteroides = dificultad.calcularVelocidadAsteroides(ronda);
+
+                    Screen ss = new PantallaJuego(game, ronda, vidas, score, velXAsteroides, velYAsteroides);
+              
+                    ss.resize(1200, 800);
+                    game.setScreen(ss);
+                    dispose();
+                }
 	}
 
 	@Override
