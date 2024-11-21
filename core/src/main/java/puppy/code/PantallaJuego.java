@@ -23,18 +23,22 @@ public class PantallaJuego implements Screen {
     private int velYAsteroides;
     private int cantAsteroides;
     private int cantAsteroidesGrandes;
+    private DificultadStrategy dificultad;
 
     private Nave4 nave;
     private ArrayList<Ball2> balls = new ArrayList<>();
     private ArrayList<Bullet> balas = new ArrayList<>();
 
-    public PantallaJuego(SpaceNavigation game, int ronda, int vidas, int score, int velXAsteroides, int velYAsteroides) {
+    public PantallaJuego(SpaceNavigation game, int ronda, int vidas, int score, int velXAsteroides, int velYAsteroides, DificultadStrategy dificultad) {
         this.game = game;
         this.velXAsteroides = velXAsteroides;
         this.velYAsteroides = velYAsteroides;
+        this.dificultad = dificultad;
+        
         GameManager gm = GameManager.getInstance();
-        this.cantAsteroides = calcularCantidadAsteroides(ronda);
-        this.cantAsteroidesGrandes = calcularCantidadAsteroidesGrandes(ronda);
+        this.cantAsteroides = dificultad.calcularCantidadAsteroides(gm.getRound());
+        this.cantAsteroidesGrandes = dificultad.calcularCantidadAsteroidesGrande(gm.getRound());
+        
         batch = game.getBatch();
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 640);
@@ -172,7 +176,7 @@ public class PantallaJuego implements Screen {
         GameManager gm = GameManager.getInstance();
         
         // Redirige a la pantalla de "Game Over"
-        game.setScreen(new PantallaGameOver(game));
+        game.setScreen(new PantallaGameOver(game, dificultad));
 
         // Verifica si el puntaje actual es mayor que el puntaje más alto registrado
         if (gm.getScore() > gm.getHighScore()) {
@@ -206,9 +210,9 @@ public class PantallaJuego implements Screen {
         int currentScore = gm.getScore();
 
         // Cambia a la siguiente pantalla con los valores actualizados
-        game.setScreen(new PantallaJuego(game, gm.getRound(), nave.getVidas(), currentScore, velXAsteroides + 1, velYAsteroides + 1));
+        game.setScreen(new PantallaJuego(game, gm.getRound(), nave.getVidas(), currentScore, velXAsteroides + 1, velYAsteroides + 1, dificultad));
         dispose();
-}
+    }
 
     public boolean agregarBala(Bullet bb) {
         return balas.add(bb);

@@ -1,17 +1,21 @@
 package puppy.code;
 public class DificultadMedia implements DificultadStrategy {
+
     @Override
     public int calcularCantidadAsteroides(int ronda) {
-        return 1 + (ronda - 1) * 2;
+        // Aumenta la cantidad de asteroides de forma progresiva
+        return 3 + (ronda - 1) * 2; // Siempre al menos 3 asteroides
     }
 
     @Override
     public int calcularCantidadAsteroidesGrande(int ronda) {
-        return Math.min(ronda, 5); // Solo hasta 5 asteroides grandes
+        // Escala gradualmente los asteroides grandes, con un límite de 7
+        return Math.min((ronda + 1) / 2, 7);
     }
 
     @Override
     public int calcularVelocidadAsteroides(int ronda) {
-        return 15; // Velocidad baja en dificultad fácil
+        // Incrementa ligeramente la velocidad en cada ronda
+        return 4 + (ronda - 1) / 3; // Velocidad moderada y progresiva
     }
 }

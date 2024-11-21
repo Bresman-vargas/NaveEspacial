@@ -14,8 +14,9 @@ public class PantallaGameOver implements Screen {
 	private OrthographicCamera camera;
 	private BitmapFont gameOverFont;
 	private BitmapFont instructionFont;
+        private DificultadStrategy dificultad;
 
-	public PantallaGameOver(SpaceNavigation game) {
+	public PantallaGameOver(SpaceNavigation game, DificultadStrategy dificultad) {
 		this.game = game;
 
 		camera = new OrthographicCamera();
@@ -50,7 +51,7 @@ public class PantallaGameOver implements Screen {
 
 		// Reinicia el juego al hacer clic o presionar cualquier tecla
 		if (Gdx.input.isTouched() || Gdx.input.isKeyJustPressed(Input.Keys.ANY_KEY)) {
-			Screen ss = new PantallaJuego(game,1,3,0,1,1);
+			Screen ss = new PantallaJuego(game,1,3,0,1,1, dificultad);
 			ss.resize(1200, 800);
 			game.setScreen(ss);
 			dispose();

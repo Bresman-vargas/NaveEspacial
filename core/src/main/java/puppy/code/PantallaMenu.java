@@ -100,7 +100,7 @@ public class PantallaMenu implements Screen {
                     int velXAsteroides = dificultad.calcularVelocidadAsteroides(ronda);
                     int velYAsteroides = dificultad.calcularVelocidadAsteroides(ronda);
 
-                    Screen ss = new PantallaJuego(game, ronda, vidas, score, velXAsteroides, velYAsteroides);
+                    Screen ss = new PantallaJuego(game, ronda, vidas, score, velXAsteroides, velYAsteroides, dificultad);
               
                     ss.resize(1200, 800);
                     game.setScreen(ss);
