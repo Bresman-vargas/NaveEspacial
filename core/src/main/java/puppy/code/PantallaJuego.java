@@ -19,8 +19,6 @@ public class PantallaJuego implements Screen {
     private SpriteBatch batch;
     private Sound explosionSound;
     private Music gameMusic;
-    private int score;
-    private int ronda;
     private int velXAsteroides;
     private int velYAsteroides;
     private int cantAsteroides;
@@ -31,13 +29,8 @@ public class PantallaJuego implements Screen {
 
     public PantallaJuego(SpaceNavigation game, int ronda, int vidas, int score, int velXAsteroides, int velYAsteroides) {
         this.game = game;
-        this.ronda = ronda;
-        this.score = score;
-        this.velXAsteroides = velXAsteroides;
-        this.velYAsteroides = velYAsteroides;
-
+        GameManager gm = GameManager.getInstance();
         this.cantAsteroides = calcularCantidadAsteroides(ronda);
-
         batch = game.getBatch();
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 640);
@@ -72,11 +65,12 @@ public class PantallaJuego implements Screen {
     }
 
     public void dibujaEncabezado() {
-        CharSequence str = "Vidas: " + nave.getVidas() + " Ronda: " + ronda;
+        GameManager gm = GameManager.getInstance();
+        CharSequence str = "Vidas: " + nave.getVidas() + " Ronda: " + gm.getRound();
         game.getFont().getData().setScale(2f);
         game.getFont().draw(batch, str, 10, 30);
-        game.getFont().draw(batch, "Score: " + this.score, Gdx.graphics.getWidth() - 150, 30);
-        game.getFont().draw(batch, "HighScore: " + game.getHighScore(), Gdx.graphics.getWidth() / 2 - 100, 30);
+        game.getFont().draw(batch, "Score: " + gm.getScore(), Gdx.graphics.getWidth() - 150, 30);
+        game.getFont().draw(batch, "HighScore: " + gm.getHighScore(), Gdx.graphics.getWidth() / 2 - 100, 30);
     }
 
     @Override
@@ -126,7 +120,7 @@ public class PantallaJuego implements Screen {
                     asteroide.alColisionar(b); // Llama al método de colisión en el asteroide
                     balls.remove(j); // Elimina el asteroide
                     j--; // Ajusta el índice después de eliminar
-                    score += 10; // Incrementa el puntaje
+                    GameManager.getInstance().incrementScore(10); // Incrementa el puntaje
                     b.alColisionar(asteroide); // Marca la bala como destruida al colisionar
                 }
             }
@@ -159,18 +153,46 @@ public class PantallaJuego implements Screen {
     }
 
     private void manejarGameOver() {
-        if (score > game.getHighScore()) {
-            game.setHighScore(score);
-        }
+        GameManager gm = GameManager.getInstance();
+        
+        // Redirige a la pantalla de "Game Over"
         game.setScreen(new PantallaGameOver(game));
+
+        // Verifica si el puntaje actual es mayor que el puntaje más alto registrado
+        if (gm.getScore() > gm.getHighScore()) {
+            gm.setHighScore(gm.getScore()); // Actualiza el high score
+        }
+
+        // Restablece el puntaje a 0
+        gm.setScore(0);
+        
+        // Actualizar la ronda
+        gm.setRound(0);
+
+        // Restablece las vidas a 3
+        nave.setVidas(3);
         dispose();
     }
+        
 
     private void iniciarSiguienteRonda() {
-        game.setScreen(new PantallaJuego(game, ronda + 1, nave.getVidas(), score,
-                                         velXAsteroides + 1, velYAsteroides + 1));
+        GameManager gm = GameManager.getInstance();
+        
+        // Verifica si el puntaje actual es mayor que el puntaje más alto registrado
+        if (gm.getScore() > gm.getHighScore()) {
+            gm.setHighScore(gm.getScore()); // Actualiza el high score
+        }
+
+        // Incrementa la ronda
+        gm.setRound(gm.getRound() + 1);
+
+        // Obtén el puntaje actual del GameManager (no se reinicia)
+        int currentScore = gm.getScore();
+
+        // Cambia a la siguiente pantalla con los valores actualizados
+        game.setScreen(new PantallaJuego(game, gm.getRound(), nave.getVidas(), currentScore, velXAsteroides + 1, velYAsteroides + 1));
         dispose();
-    }
+}
 
     public boolean agregarBala(Bullet bb) {
         return balas.add(bb);
