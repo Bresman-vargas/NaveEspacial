@@ -57,31 +57,17 @@ public class PantallaJuego implements Screen {
                          Gdx.audio.newSound(Gdx.files.internal("pop-sound.mp3")));
         nave.setVidas(vidas);
 
+        // Crear meteoritos pequeños y grandes según las cantidades determinadas por la dificultad
         Random r = new Random();
         for (int i = 0; i < cantAsteroides; i++) {
-            Ball2 bb = new Ball2(r.nextInt((int) Gdx.graphics.getWidth()),
-                                  50 + r.nextInt((int) Gdx.graphics.getHeight() - 50),
-                                  20 + r.nextInt(10), velXAsteroides + r.nextInt(4),
-                                  velYAsteroides + r.nextInt(4),
-                                  new Texture(Gdx.files.internal("aGreyMedium4.png")));
+            Ball2 bb = MeteoritoFactory.crearMeteorito("pequeño", velXAsteroides + r.nextInt(4), velYAsteroides + r.nextInt(4));
             balls.add(bb);
         }
-        for (int i = 0; i < cantAsteroidesGrandes; i++) {
-            Ball2 bb = new Ball2(r.nextInt((int) Gdx.graphics.getWidth()),
-                                  50 + r.nextInt((int) Gdx.graphics.getHeight() - 50),
-                                  20 + r.nextInt(10), velXAsteroides + r.nextInt(4),
-                                  velYAsteroides + r.nextInt(4),
-                                  new Texture(Gdx.files.internal("aGreyLarge.png")));
-            balls.add(bb);
-        }
-    }
 
-    private int calcularCantidadAsteroides(int ronda) {
-        return 1 + (ronda - 1) * 2;
-    }
-    
-    private int calcularCantidadAsteroidesGrandes(int ronda) {
-        return 1 + (ronda - 1);
+        for (int i = 0; i < cantAsteroidesGrandes; i++) {
+            Ball2 bb = MeteoritoFactory.crearMeteorito("grande", velXAsteroides + r.nextInt(4), velYAsteroides + r.nextInt(4));
+            balls.add(bb);
+        }
     }
 
     public void dibujaEncabezado() {
@@ -141,7 +127,7 @@ public class PantallaJuego implements Screen {
                     balls.remove(j); // Elimina el asteroide
                     j--; // Ajusta el índice después de eliminar
                     GameManager.getInstance().incrementScore(10); // Incrementa el puntaje
-                    b.alColisionar(asteroide); // Marca la bala como destruida al colisionar
+                    b.alColisionar(asteroide); 
                 }
             }
 

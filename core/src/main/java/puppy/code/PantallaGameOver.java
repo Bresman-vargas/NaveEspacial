@@ -18,6 +18,7 @@ public class PantallaGameOver implements Screen {
 
 	public PantallaGameOver(SpaceNavigation game, DificultadStrategy dificultad) {
 		this.game = game;
+                this.dificultad = dificultad;
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 1200, 800);
