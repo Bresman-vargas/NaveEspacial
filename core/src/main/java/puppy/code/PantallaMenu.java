@@ -9,124 +9,86 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 
-public class PantallaMenu implements Screen {
+public class PantallaMenu extends PantallaBase {
 
-	private SpaceNavigation game;
-	private OrthographicCamera camera;
-	private BitmapFont titleFont;
-	private BitmapFont instructionFont;
-        private BitmapFont difficultyFont;
-        
-	private float timeElapsed;
-        private String difficulty = "No seleccionada";  // Dificultad predeterminada
-        private DificultadStrategy dificultad;
-        private boolean difficultySelected = false;
+    private BitmapFont titleFont;
+    private BitmapFont instructionFont;
+    private BitmapFont difficultyFont;
 
-	public PantallaMenu(SpaceNavigation game) {
-		this.game = game;
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 1200, 800);
+    private float timeElapsed;
+    private String difficulty = "No seleccionada";
+    private DificultadStrategy dificultad;
+    private boolean difficultySelected = false;
 
-		// Configuración de fuentes
-		titleFont = new BitmapFont();
-		titleFont.setColor(Color.SKY);
-		titleFont.getData().setScale(3); // Aumenta el tamaño de la fuente del título
+    public PantallaMenu(SpaceNavigation game) {
+        super(game);
+    }
 
-		instructionFont = new BitmapFont();
-		instructionFont.getData().setScale(1.5f);
-                
-                difficultyFont = new BitmapFont();
-                difficultyFont.setColor(Color.LIGHT_GRAY);
-                difficultyFont.getData().setScale(1.5f);
-	}
+    
+    @Override
+    protected void inicializar() {
+        titleFont = new BitmapFont();
+        titleFont.setColor(Color.SKY);
+        titleFont.getData().setScale(3);
 
-	@Override
-	public void render(float delta) {
-		// Fondo de pantalla de color oscuro
-		ScreenUtils.clear(0.05f, 0.05f, 0.1f, 1); // Fondo negro azulado para el espacio
+        instructionFont = new BitmapFont();
+        instructionFont.getData().setScale(1.5f);
 
-		// Control del parpadeo
-		timeElapsed += delta;
-		Color instructionColor = Color.LIGHT_GRAY.cpy();
-		instructionColor.a = 0.5f + 0.5f * (float) Math.sin(timeElapsed * 2); // Ajusta el parpadeo de la opacidad
+        difficultyFont = new BitmapFont();
+        difficultyFont.setColor(Color.LIGHT_GRAY);
+        difficultyFont.getData().setScale(1.5f);
+    }
 
-		camera.update();
-		game.getBatch().setProjectionMatrix(camera.combined);
+    @Override
+    protected void actualizar(float delta) {
+        timeElapsed += delta;
 
-		game.getBatch().begin();
+        if (!difficultySelected) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
+                dificultad = new DificultadFacil();
+                difficulty = "Fácil";
+                difficultySelected = true;
+            } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
+                dificultad = new DificultadMedia();
+                difficulty = "Media";
+                difficultySelected = true;
+            } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
+                dificultad = new DificultadDificil();
+                difficulty = "Difícil";
+                difficultySelected = true;
+            }
+        }
 
-		// Título "Bienvenido a Space Navigation!"
-		titleFont.draw(game.getBatch(), "Bienvenido a Space Navigation!", 200, 500);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            if (dificultad == null) {
+                dificultad = new DificultadFacil();
+            }
+            game.setScreen(new PantallaJuego(game, 1, 3, 0, dificultad.calcularVelocidadAsteroides(1),
+                    dificultad.calcularVelocidadAsteroides(1), dificultad));
+            dispose();
+        }
+    }
 
-                
-                // Instrucciones para seleccionar dificultad
-                difficultyFont.draw(game.getBatch(), "Selecciona la dificultad: 1. Fácil / 2. Media / 3. Difícil", 200, 350);
-                difficultyFont.draw(game.getBatch(), "Dificultad seleccionada: " + difficulty, 200, 300);
-                
-                // Instrucciones con parpadeo suave
-                instructionFont.setColor(instructionColor); // Aplica el color de parpadeo
-                instructionFont.draw(game.getBatch(), "Pincha ENTER para comenzar ...", 200, 200);
+    @Override
+    protected void dibujar() {
+        game.getBatch().begin();
 
-		game.getBatch().end();
+        titleFont.draw(game.getBatch(), "Bienvenido a Space Navigation!", 200, 500);
+        difficultyFont.draw(game.getBatch(), "Selecciona la dificultad: 1. Fácil / 2. Media / 3. Difícil", 200, 350);
+        difficultyFont.draw(game.getBatch(), "Dificultad seleccionada: " + difficulty, 200, 300);
 
-		// Detecta la selección de dificultad (1 o 3)
-                if (!difficultySelected) {
-                    if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
-                        dificultad = new DificultadFacil();
-                        difficulty = "Fácil";
-                        difficultySelected = true;
-                        
-                    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
-                        dificultad = new DificultadMedia();
-                        difficulty = "Media";
-                        difficultySelected = true;
-                        
-                    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
-                        dificultad = new DificultadDificil();
-                        difficulty = "Difícil";
-                        difficultySelected = true;
-                    }
-                }
+        Color instructionColor = Color.LIGHT_GRAY.cpy();
+        instructionColor.a = 0.5f + 0.5f * (float) Math.sin(timeElapsed * 2);
+        instructionFont.setColor(instructionColor);
+        instructionFont.draw(game.getBatch(), "Presiona ENTER para comenzar ...", 200, 200);
 
-                // Si se presiona ENTER, asigna dificultad por defecto si no se ha seleccionado
-                if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-                    if (dificultad == null) {
-                        // Asume "Fácil" si no se ha seleccionado ninguna dificultad
-                        dificultad = new DificultadFacil();
-                    }
-                    int ronda = 1; // Ronda inicial
-                    int vidas = 3; // Número de vidas iniciales
-                    int score = 0; // Puntuación inicial
-                    int velXAsteroides = dificultad.calcularVelocidadAsteroides(ronda);
-                    int velYAsteroides = dificultad.calcularVelocidadAsteroides(ronda);
+        game.getBatch().end();
+    }
 
-                    Screen ss = new PantallaJuego(game, ronda, vidas, score, velXAsteroides, velYAsteroides, dificultad);
-              
-                    ss.resize(1200, 800);
-                    game.setScreen(ss);
-                    dispose();
-                }
-	}
-
-	@Override
-	public void show() {}
-
-	@Override
-	public void resize(int width, int height) {}
-
-	@Override
-	public void pause() {}
-
-	@Override
-	public void resume() {}
-
-	@Override
-	public void hide() {}
-
-	@Override
-	public void dispose() {
-		// Libera recursos de las fuentes
-		titleFont.dispose();
-		instructionFont.dispose();
-	}
+    @Override
+    public void dispose() {
+        titleFont.dispose();
+        instructionFont.dispose();
+        difficultyFont.dispose();
+    }
 }

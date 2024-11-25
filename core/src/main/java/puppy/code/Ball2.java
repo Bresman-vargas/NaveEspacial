@@ -9,12 +9,14 @@ public class Ball2 extends ObjetoEspacial implements Colisionable {
     private int size;
     private boolean isDestroyed; // Estado que indica si el meteorito ha sido destruido
 
-    public Ball2(int x, int y, int xSpeed, int ySpeed, Texture tx) {
+    public Ball2(int x, int y, int size, int xSpeed, int ySpeed, Texture tx) {
         super(tx, x, y);
+        this.size = size;
         this.xVel = xSpeed;
         this.yVel = ySpeed;
         this.isDestroyed = false; // Inicialmente, el meteorito no está destruido
 
+        
         // Control de límites iniciales
         if (x - size < 0) spr.setX(x + size);
         if (x + size > Gdx.graphics.getWidth()) spr.setX(x - size);

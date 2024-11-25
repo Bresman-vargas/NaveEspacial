@@ -62,6 +62,7 @@ public class PantallaGameOver implements Screen {
 	@Override
 	public void show() {}
 
+        
 	@Override
 	public void resize(int width, int height) {}
 
